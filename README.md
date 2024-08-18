@@ -1,4 +1,4 @@
-# Launching AWS EC2 instances, pushing images to AWS ECR and subsequently deploying them as containers via shell scripts and jenkins pipelines.
+# Launching AWS EC2 instances, pushing images to AWS ECR and subsequently deploying them as containers via shell scripts in jenkins pipelines.
 
 Collection of config files and shell scripts interacting with the AWS CLI, launching EC2 instances in AWS and automatically deploying images hosted on AWS ECR via declarative Jenkins pipelines. 
 
@@ -64,9 +64,13 @@ The main projects are:
     ./ec2-install-docker.sh
     ```
 
-1. To deploy a docker image
+1. To build a local docker image, push it to a private docker hub repo and then automatically pull and run it on your EC2 instance
 
-    asd	
+    Simply run
+    ```
+    ./build-and-push-local-docker-img.sh
+    ./ec2-pull-and-run-docker-img.sh
+    ```
 
 
 ## Usage (Exercises)
