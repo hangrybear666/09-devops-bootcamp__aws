@@ -13,16 +13,13 @@ source ../config/remote.properties
 source ../.env
 
 # ask for desired image version
-read -p "Please provide your desired image version: " VERSION_NUM 
+read -p "Please provide your desired image version: " VERSION_NUM
 
-# Create dynamic node-app docker tag
+PRIVATE_KEY_PATH="$HOME/.ssh/docker-runner-devops-bootcamp.pem"
 
-DOCKER_TAG="node-app-$VERSION_NUM"
-cd ../node-app
+if [ ! -f $PRIVATE_KEY_PATH ]
+then
+  echo "docker-runner-devops-bootcamp.pem private key file not found in $HOME/.ssh/ folder."
+  exit 1
+fi
 
-# build image
-docker build -f Dockerfile -t $DOCKER_HUB_REPO:$DOCKER_TAG .
-# login to docker hub
-echo $DOCKER_HUB_TOKEN | docker login -u $DOCKER_HUB_USER --password-stdin
-# push image to docker hub
-docker push $DOCKER_HUB_REPO:$DOCKER_TAG

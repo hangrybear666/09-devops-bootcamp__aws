@@ -45,4 +45,7 @@ sudo systemctl start docker
 
 echo "Installed docker version: \$(docker -v)"
 echo "Installed docker compose version: \$(docker compose version)"
+
+# add user to docker group so docker commands can be run without sudo
+sudo usermod -aG docker \$USER
 EOF

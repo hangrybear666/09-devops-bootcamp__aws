@@ -38,9 +38,6 @@ The main projects are:
 
     Make sure to install docker and docker-compose (typically built-in) for local development. See https://docs.docker.com/engine/install/
 
-6. Dont forget to open ports in your remote firewall.
-
-    3000 for node-app, 22 for ssh.
 
 ## Usage (Demo Projects)
 
@@ -63,6 +60,8 @@ The main projects are:
     cd scripts
     ./ec2-install-docker.sh
     ```
+
+    f. Dont forget to open ports in your EC2 instance's security group 3080 for node-app, 22 for ssh, ideally only for your own ip-address
 
 1. To build a local docker image, push it to a private docker hub repo and then automatically pull and run it on your EC2 instance
 
