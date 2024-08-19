@@ -45,11 +45,11 @@ The main projects are:
 
     c. Change permissions on your private key file by running `sudo chmod 400 /home/user/.ssh/docker-runner-devops-bootcamp.pem`
 
-    d. Add your ec2 instance's public ip address and your docker hub private repository url to `config/remote.properties` 
+    d. Add your ec2 instance's public ip address and your docker hub private repository url to `config/remote.properties` NOTE: don't use quotation marks, as readProperties plugin parses these as values
     ```
     EC2_PUBLIC_IP_1=3.79.237.46
-    EC2_USER_1="ec2-user"
-    DOCKER_HUB_REPO="hangrybear/devops_bootcamp"
+    EC2_USER_1=ec2-user
+    DOCKER_HUB_REPO=hangrybear/devops_bootcamp
     ```
 
     e. Install docker on your EC2 instance by running
@@ -82,9 +82,11 @@ The main projects are:
 
     e. Manage Jenkins -> Available Plugins -> Ignore Committer Strategy -> Install. This allows us to ignore commits by the jenkins pipeline itself for build triggering.
 
-    f. Install Plugin for ssh connection under Manage Jenkins -> Available Plugins -> SSH Agent
+    f. Manage Jenkins -> Available Plugins -> SSH Agent to install Plugin for ssh connection to remote instances
 
-    g. In your Github Repository add your own jenkins repo url on push events as hook, navigate to Settings -> Webhooks -> http://165.227.155.148:8080/github-webhook/ 
+    g. Manage Jenkins -> Available Plugins -> Pipeline Utility Steps for reading property files from repository to receive key-value pairs from config
+
+    h. In your Github Repository add your own jenkins repo url on push events as hook, navigate to Settings -> Webhooks -> http://165.227.155.148:8080/github-webhook/ 
 
 3. To have your pipeline automatically increment the artifact version, add a dynamic docker image tag, push the image to docker hub, ssh into AWS EC2 to pull and run the image via docker compose and finally commit the version changes to scm without triggering an automatic build via push hook, follow these steps
 

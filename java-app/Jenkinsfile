@@ -8,6 +8,7 @@ library identifier: '09-devops-bootcamp__aws@main', retriever: modernSCM(
     libraryPath: 'jenkins-shared-library/')
 def groovyScript
 
+
 pipeline {
     agent any
     environment {
@@ -22,16 +23,23 @@ pipeline {
         text(name: 'EC2_PUBLIC_IP', defaultValue: '3.79.237.46', description: 'Enter your own docker hub repository')
     }
     stages {
-        stage('init') {
+        stage('Init') {
             steps {
-                dir("java-app") {
-                    script {
-                        groovyScript = load "script.groovy"
-                    }
+                script {
+                    groovyScript = load "java-app/script.groovy"
                 }
             }
         }
-        stage('increment version') {
+
+        stage('setup Environment') {
+            steps {
+                script {
+                    groovyScript.extractRemoteProperties()
+                }
+            }
+        }
+
+        stage('Increment version') {
             steps {
                 dir("java-app") {
                     script {
@@ -41,7 +49,7 @@ pipeline {
                 }
             }
         }
-        stage('build app') {
+        stage('Build artifact') {
             steps {
                 dir("java-app") {
                     script {
@@ -51,7 +59,7 @@ pipeline {
                 }
             }
         }
-        stage('build image') {
+        stage('Build image') {
             steps {
                 dir("java-app") {
                     script {
@@ -65,7 +73,19 @@ pipeline {
                 }
             }
         }
-        stage("deploy") {
+
+        stage('Deploy docker compose to EC2') {
+            steps {
+                script {
+                    echo 'copying docker-compose to remote...'
+                    sshagent(['ec2-server-key']) {
+
+                    }
+                }
+            }
+        }
+
+        stage("Deploy docker image to EC2") {
             steps {
                 script {
                     echo 'deploying docker image to EC2...'
@@ -76,7 +96,7 @@ pipeline {
                 }
             }               
         }
-        stage('commit version update'){
+        stage('Commit version update'){
             steps {
                 script {
                     withCredentials([usernamePassword(credentialsId: 'git-creds', passwordVariable: 'PASS', usernameVariable: 'USER')]){
