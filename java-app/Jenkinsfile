@@ -13,6 +13,14 @@ pipeline {
     tools {
         maven 'Maven'
     }
+
+    parameters {
+        // string(name: 'PERSON', defaultValue: 'Mr Jenkins', description: 'Who should I say hello to?')
+        // text(name: 'DOCKER_HUB_REPO_URL', defaultValue: 'hangrybear/devops_bootcamp', description: 'Enter your own docker hub repository')
+        // booleanParam(name: 'TOGGLE', defaultValue: true, description: 'Toggle this value')
+        choice(name: 'DEPLOYMENT_STRATEGY', choices: ['docker run (java-app only)', 'docker compose (/w postgres)'], description: 'Pick a deployment strategy for EC2')
+        // password(name: 'PASSWORD', defaultValue: 'SECRET', description: 'Enter a password')
+    }
     stages {
         stage('Init') {
             steps {
@@ -70,17 +78,26 @@ pipeline {
         }
 
         stage('Deploy docker compose to EC2') {
+            when {
+                expression {
+                    return DEPLOYMENT_STRATEGY == 'docker compose (/w postgres)';
+                }
+            }
             steps {
                 script {
                     echo 'copying docker-compose to remote...'
                     sshagent(['ec2-server-key']) {
-
+                        sh "bash ./ec2-deployment-payload.sh"
                     }
                 }
             }
         }
-
         stage("Deploy docker image to EC2") {
+            when {
+                expression {
+                    return DEPLOYMENT_STRATEGY == 'docker run (java-app only)';
+                }
+            }
             steps {
                 script {
                     echo 'deploying docker image to EC2...'

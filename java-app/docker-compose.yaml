@@ -15,12 +15,12 @@ services:
     - 5432:5432
 
   java-app:
-    image: ${AWS_NODE_IMG_URL}
+    image: ${DOCKER_HUB_IMG_URL}
     container_name: java-app
     networks:
       - java-postgres
     ports:
-    - 3080:3080
+    - 8080:8080
     depends_on:
       - postgres
 
