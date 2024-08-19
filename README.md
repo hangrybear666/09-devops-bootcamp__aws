@@ -45,7 +45,8 @@ The main projects are:
 
     c. Change permissions on your private key file by running `sudo chmod 400 /home/user/.ssh/docker-runner-devops-bootcamp.pem`
 
-    d. Add your ec2 instance's public ip address and your docker hub private repository url to `config/remote.properties` NOTE: don't use quotation marks, as readProperties plugin parses these as values
+    d. Add your ec2 instance's public ip address and your docker hub private repository url to `config/remote.properties` 
+    NOTE: don't use quotation marks, as readProperties plugin parses these as part of values
     ```
     EC2_PUBLIC_IP_1=3.79.237.46
     EC2_USER_1=ec2-user
@@ -58,7 +59,7 @@ The main projects are:
     ./ec2-install-docker.sh
     ```
 
-    f. Dont forget to open ports in your EC2 instance's security group 3080 for node-app, 22 for ssh, ideally only for your own ip-address and the ip address of jenkins server
+    f. Dont forget to open ports in your EC2 instance's security group: 8080 for java, 3080 for node-app, 22 for ssh, ideally only for your own ip-address and the ip address of jenkins server
 
 1. To build a local docker image, push it to a private docker hub repo and then automatically pull and run it on your EC2 instance
 
