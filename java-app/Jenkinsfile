@@ -33,13 +33,13 @@ pipeline {
         stage('load .env file') {
             steps {
                 script {
-                    readProperties(file: .env).each {key, value -> env[key] = value }
+                    readProperties(file: '.env').each {key, value -> env[key] = value }
                     sh "echo ${env.DOCKER_HUB_USER}"
                     sh "echo ${env.DOCKER_HUB_REPO}"
                 }
                 dir("config") {
                     script {
-                        readProperties(file: remote.properties).each {key, value -> env[key] = value }
+                        readProperties(file: 'remote.properties').each {key, value -> env[key] = value }
                         sh "echo ${env.EC2_PUBLIC_IP_1}"
                         sh "echo ${env.EC2_USER_1}"
                     }
