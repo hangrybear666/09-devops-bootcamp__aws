@@ -20,11 +20,8 @@ The main projects are:
 
 3. Create EC2 instance with Red Hat Linux and configure VPC/Security Group for ssh access
 
-
-3. Install additional dependencies on remote
-
-    Some Linux distros ship without the `netstat` or `jq` commands we use. In that case run `apt install net-tools` or `dnf install net-tools` on fedora et cetera.
-
+    Ensure to have your jenkins ip and your local ip whitelisted for inbound access.
+    
 4. Create environment files 
         
     Add an `.env` file in your repository's root directory and add the following key value-pairs:
@@ -70,6 +67,35 @@ The main projects are:
     ./build-and-push-local-docker-img.sh
     ./ec2-pull-and-run-docker-img.sh
     ```
+
+2. 
+
+    NOTE: if you have followed Demo Project 1 from https://github.com/hangrybear666/08-devops-bootcamp__jenkins.git you can skip steps a-e
+
+    a. Add `docker-hub-repo` credential-id to jenkins with your username and password you can find in your `.env` file after having run setup step 4.
+    
+    b. Add your git credentials with the id `git-creds` and the username `x-token-auth` and fetch a personal access token from your git account.
+
+    c. Add Maven under Manage Jenkins -> Tools -> Maven and name it `Maven`.
+
+    d. Navigate to Manage Jenkins -> System -> Add Github Server with name `Github`, check the "Manage Hooks" checkbox and and add the API_URL https://api.github.com with a Github API Token as Jenkins credentials and add it to your `.env` file to not lose access. NOTE: The github token must have only webhook permissions, the rest is optional.
+
+    e. Manage Jenkins -> Available Plugins -> Ignore Committer Strategy -> Install. This allows us to ignore commits by the jenkins pipeline itself for build triggering.
+
+    f. Create a multibranch pipeline under New Item -> Multibranch Pipeline -> `ec2-java-app-multibranch` and set it to get `java-app/Jenkinsfile` (!) from SCM under Definition and add your Git Credentials with the branch specifier `*`.
+
+    g. In your Github Repository add your jenkins repo url on push events as hook, navigate to Settings -> Webhooks -> http://165.227.155.148:8080/github-webhook/ 
+
+    h. Configure your pipeline to avoid builds after version commits from jenkins itself via Plugin by navigating to your multibranch pipeline settings and adding `jenkins@example.com` under Configuration -> Branch Sources -> Add -> Ignore Committer Strategy. NOTE: Make sure to check the `Allow builds when a changeset contains non-ignored author(s)` Flag!
+
+    i. Install Plugin for ssh connection under Manage Jenkins -> Available Plugins -> SSH Agent
+
+    j. Change the default value of `DOCKER_HUB_REPO_URL`  in your `java-app/Jenkinsfile` file to your own and push the changes or simply provide it as user input when building the pipeline with parameters.#
+
+    k. In your multibranch pipeline navigate to Credentials and add SSH Username with private key and add the private key's contents of your AWS EC2 instance as `ec2-server-key`
+
+
+
 
 
 ## Usage (Exercises)

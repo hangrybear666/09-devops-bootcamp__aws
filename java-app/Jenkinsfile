@@ -1,0 +1,121 @@
+#!/user/bin/env groovy
+
+library identifier: '09-devops-bootcamp__aws@main', retriever: modernSCM(
+    scm: [$class: 'GitSCMSource', 
+    credentialsId: 'git-creds', 
+    remote: 'https://github.com/hangrybear666/09-devops-bootcamp__aws.git', 
+    traits: [gitBranchDiscovery()]], 
+    libraryPath: 'jenkins-shared-library/')
+def groovyScript
+
+pipeline {
+    agent any
+    environment {
+        DEPLOYABLE_NAME = 'java-app'
+    }
+    tools {
+        maven 'Maven'
+    }
+    parameters {
+        text(name: 'DOCKER_HUB_REPO_URL', defaultValue: 'hangrybear/devops_bootcamp', description: 'Enter your own docker hub repository')
+    }
+    stages {
+        stage('init') {
+            steps {
+                dir("java-app") {
+                    script {
+                        groovyScript = load "script.groovy"
+                    }
+                }
+            }
+        }
+
+        stage('load .env file') {
+            steps {
+                script {
+                    readProperties(file: .env).each {key, value -> env[key] = value }
+                    sh "echo ${env.DOCKER_HUB_USER}"
+                    sh "echo ${env.DOCKER_HUB_REPO}"
+                }
+                dir("config") {
+                    script {
+                        readProperties(file: remote.properties).each {key, value -> env[key] = value }
+                        sh "echo ${env.EC2_PUBLIC_IP_1}"
+                        sh "echo ${env.EC2_USER_1}"
+                    }
+                }
+            }
+        }
+        stage('increment version') {
+            steps {
+                dir("java-app") {
+                    script {
+                        echo 'incrementing app version...'
+                        sh 'mvn build-helper:parse-version versions:set \
+                            -DnewVersion=\\\${parsedVersion.majorVersion}.\\\${parsedVersion.minorVersion}.\\\${parsedVersion.nextIncrementalVersion} \
+                            versions:commit'
+                        def matcher = readFile('pom.xml') =~ '<version>(.+)</version>'
+                        def version = matcher[0][1]
+                        env.VERSION = "$version"
+                        env.VERSION_NUM = "$version-$BUILD_NUMBER"
+                    }
+                }
+            }
+        }
+        stage('build app') {
+            steps {
+                dir("java-app") {
+                    script {
+                        // using jenkins shared library groovy scripts in /jenkins-shared-library/vars
+                        buildJar()
+                    }
+                }
+            }
+        }
+        stage('build image') {
+            steps {
+                dir("java-app") {
+                    script {
+                        withCredentials([usernamePassword(credentialsId: 'docker-hub-repo', passwordVariable: 'PASS', usernameVariable: 'USER')]){
+                            // using jenkins shared library groovy scripts extended themselves by a groovy Docker class in /jenkins-shared-library
+                            buildImage(env.DEPLOYABLE_NAME)
+                            dockerLogin()
+                            dockerPush(env.DEPLOYABLE_NAME)
+                        }
+                    }
+                }
+            }
+        }
+        stage("deploy") {
+            steps {
+                script {
+                    echo 'deploying docker image to EC2...'
+                    def dockerCmd = "docker run -p 3080:3080 -d ${DOCKER_HUB_REPO_URL}:${DEPLOYABLE_NAME}-${VERSION_NUM}"
+                    sshagent(['ec2-server-key']) {
+                        sh "ssh -o StrictHostKeyChecking=no ec2-user@3.79.237.46 ${dockerCmd}"
+                    }
+                }
+            }               
+        }
+        stage('commit version update'){
+            steps {
+                script {
+                    withCredentials([usernamePassword(credentialsId: 'git-creds', passwordVariable: 'PASS', usernameVariable: 'USER')]){
+                        sh 'git config --global user.email "jenkins@example.com"'
+                        sh 'git config --global user.name "jenkins"'
+
+                        sh 'git status'
+                        sh 'git branch'
+                        sh 'git config --list'
+
+                        sh "git remote set-url origin https://${USER}:${PASS}@github.com/hangrybear666/09-devops-bootcamp__aws.git"
+                        sh 'git add .'
+                        sh "git commit -m 'Updated Version to ${VERSION}'"
+                        sh 'git push origin HEAD:main'
+                    }
+                }
+            }
+        }
+    }
+}
+
