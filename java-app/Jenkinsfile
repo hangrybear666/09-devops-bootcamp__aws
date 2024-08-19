@@ -8,32 +8,27 @@ library identifier: '09-devops-bootcamp__aws@main', retriever: modernSCM(
     libraryPath: 'jenkins-shared-library/')
 def groovyScript
 
-
 pipeline {
     agent any
-    environment {
-        DEPLOYABLE_NAME='java-app'
-        EC2_USER='ec2-user'
-    }
     tools {
         maven 'Maven'
-    }
-    parameters {
-        text(name: 'DOCKER_HUB_REPO_URL', defaultValue: 'hangrybear/devops_bootcamp', description: 'Enter your own docker hub repository')
-        text(name: 'EC2_PUBLIC_IP', defaultValue: '3.79.237.46', description: 'Enter your own docker hub repository')
     }
     stages {
         stage('Init') {
             steps {
                 script {
+                    // abstracts away groovy logic into single function calls
                     groovyScript = load "java-app/script.groovy"
                 }
             }
         }
 
-        stage('setup Environment') {
+        stage('Setup Environment') {
             steps {
                 script {
+                    env.DEPLOYABLE_NAME='java-app'
+                    env.EC2_USER='ec2-user'
+                    // read config/remote.properties and expose values as global env vars
                     groovyScript.extractRemoteProperties()
                 }
             }
@@ -100,17 +95,8 @@ pipeline {
             steps {
                 script {
                     withCredentials([usernamePassword(credentialsId: 'git-creds', passwordVariable: 'PASS', usernameVariable: 'USER')]){
-                        sh 'git config --global user.email "jenkins@example.com"'
-                        sh 'git config --global user.name "jenkins"'
-
-                        sh 'git status'
-                        sh 'git branch'
-                        sh 'git config --list'
-
-                        sh "git remote set-url origin https://${USER}:${PASS}@github.com/hangrybear666/09-devops-bootcamp__aws.git"
-                        sh 'git add .'
-                        sh "git commit -m 'Updated Version to ${VERSION}'"
-                        sh 'git push origin HEAD:main'
+                        // pushes a new version saved in pom.xml to github repo
+                        groovyScript.commitVersionUpdate()
                     }
                 }
             }
