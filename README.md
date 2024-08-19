@@ -21,7 +21,7 @@ The main projects are:
 3. Create EC2 instance with Red Hat Linux and configure VPC/Security Group for ssh access
 
     Ensure to have your jenkins ip and your local ip whitelisted for inbound access.
-    
+
 4. Create environment files 
         
     Add an `.env` file in your repository's root directory and add the following key value-pairs:
@@ -90,10 +90,13 @@ The main projects are:
 
     i. Install Plugin for ssh connection under Manage Jenkins -> Available Plugins -> SSH Agent
 
-    j. Change the default value of `DOCKER_HUB_REPO_URL`  in your `java-app/Jenkinsfile` file to your own and push the changes or simply provide it as user input when building the pipeline with parameters.#
+    j. Install Plugin for pipeline utils, especially readProperties under Manage Jenkins -> Available Plugins -> Pipeline Utility Steps
 
-    k. In your multibranch pipeline navigate to Credentials and add SSH Username with private key and add the private key's contents of your AWS EC2 instance as `ec2-server-key`
+    k. Change the default value of `DOCKER_HUB_REPO_URL`  in your `java-app/Jenkinsfile` file to your own and push the changes or simply provide it as user input when building the pipeline with parameters.#
 
+    l. In your multibranch pipeline navigate to Credentials and add SSH Username with private key and add the private key's contents of your AWS EC2 instance as `ec2-server-key`
+
+    m. 
 
 
 
