@@ -34,10 +34,14 @@ pipeline {
         stage('Setup Environment') {
             steps {
                 script {
+                    // read config/remote.properties and expose values as global env vars
+                    def props = readProperties file: 'config/remote.properties'
+                    env.EC2_USER = props["EC2_USER_1"]
+                    env.EC2_PUBLIC_IP = props["EC2_PUBLIC_IP_1"]
+                    env.DOCKER_HUB_REPO_URL = props["DOCKER_HUB_REPO"]
+
                     env.DEPLOYABLE_NAME='java-app'
                     env.EC2_USER='ec2-user'
-                    // read config/remote.properties and expose values as global env vars
-                    groovyScript.extractRemoteProperties()
                 }
             }
         }
@@ -84,11 +88,23 @@ pipeline {
                 }
             }
             steps {
-                script {
-                    echo 'copying docker-compose to remote...'
-                    sshagent(['ec2-server-key']) {
-                        sh "bash ./ec2-deployment-payload.sh"
+                dir("java-app") {
+                    script {
+                        // make secrets and credentials available as environment variables
+                        withCredentials([usernamePassword(credentialsId: 'docker-hub-creds', passwordVariable: 'DOCKER_HUB_TOKEN', usernameVariable: 'DOCKER_HUB_USER'),
+                                         string(credentialsId: 'postgres-pw', variable: 'POSTGRES_PASSWORD')]) {
+                            // expose Environment Variable to shell script
+                            withEnv(["DOCKER_IMG_TAG=${DOCKER_HUB_REPO_URL}:${DEPLOYABLE_NAME}-${VERSION_NUM}"
+                            ]) {
+                                // enables the private key saved as credential to be used for ssh connection to ec2 instance
+                                sshagent(['ec2-server-key']) {
+                                    // copies docker-compose via scp, sets correct env vars on ec2 machine and starts the containers
+                                    sh "bash ./ec2-deployment-payload.sh"
+                                }
+                            }
+                        }
                     }
+
                 }
             }
         }

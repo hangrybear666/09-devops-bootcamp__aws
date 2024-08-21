@@ -89,7 +89,7 @@ The main projects are:
 
     h. In your Github Repository add your own jenkins repo url on push events as hook, navigate to Settings -> Webhooks -> http://165.227.155.148:8080/github-webhook/ 
 
-3. To have your pipeline automatically increment the artifact version, add a dynamic docker image tag, push the image to docker hub, ssh into AWS EC2 to pull and run the image via docker (or docker compose) and finally commit the version changes to scm without triggering an automatic build via push hook, follow these steps
+3. To have your pipeline automatically increment the artifact version, add a dynamic docker image tag, push the image to docker hub, ssh into AWS EC2 to pull and run the image via docker (or docker compose via ssh script) and finally commit the version changes to scm without triggering an automatic build via push hook, follow these steps
 
     a. Create a multibranch pipeline under New Item -> Multibranch Pipeline -> `ec2-java-app-multibranch` and set it to get `java-app/Jenkinsfile` (!) from SCM under Definition and add your Git Credentials with the branch specifier `*`.
 
@@ -97,12 +97,17 @@ The main projects are:
 
     c. In your multibranch pipeline navigate to Credentials and add SSH Username with private key and add the private key's contents of your AWS EC2 instance with the id `ec2-server-key`
 
-    d. Push a code change to remote to trigger Github webhook build invocation or simply build the pipeline manually.
+    d. Add your docker hub credentials with the id `docker-hub-creds`.
 
-    e. To deploy the java-app only as a docker container using docker pull command, simply push a code change or build the app with default parameters.
+    e. Add a secret text credential to your pipeline named `postgres-pw` for the later docker-compose file
 
-    f. To deploy both the java-app and postgres container via `docker-compose.yaml` file simply build the pipeline with parameters and change your choice in the dropdown to 'docker compose (/w postgres)'
+    f. Push a code change to remote to trigger Github webhook build invocation or simply build the pipeline manually.
 
+    g. To deploy the java-app only as a docker container using docker pull command, simply push a code change or build the app with default parameters.
+
+    h. To deploy both the java-app and postgres container via `docker-compose.yaml` file simply build the pipeline with parameters and change your choice in the dropdown to 'docker compose (/w postgres)'
+
+    NOTE: You might have to execute the pipeline twice, because it will not know the Jenkinsfile parameter `DEPLOYMENT_STRATEGY` during first invocation, before Jenkinsfile has been loaded once.
 
 ## Usage (Exercises)
 
