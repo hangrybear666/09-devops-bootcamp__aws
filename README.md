@@ -38,7 +38,6 @@ The main projects are:
 
     Make sure to install docker and docker-compose (typically built-in) for local development. See https://docs.docker.com/engine/install/
 
-
 ## Usage (Demo Projects)
 
 0. Create an EC2 instance from AWS Management Console
@@ -133,3 +132,4 @@ The main projects are:
     ```
 ## Usage (Exercises)
 
+TODO
