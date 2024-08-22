@@ -61,6 +61,8 @@ The main projects are:
 
     f. Dont forget to open ports in your EC2 instance's security group: 8080 for java, 3080 for node-app, 22 for ssh, ideally only for your own ip-address and the ip address of jenkins server
 
+    g. Install `jq` locally, so our aws scripts can manipulate returned json output from aws cli shell scripts
+
 1. To build a local docker image, push it to a private docker hub repo and then automatically pull and run it on your EC2 instance
 
     Simply run
@@ -109,5 +111,21 @@ The main projects are:
 
     NOTE: You might have to execute the pipeline twice, because it will not know the Jenkinsfile parameter `DEPLOYMENT_STRATEGY` during first invocation, before Jenkinsfile has been loaded once.
 
+4. To Create AWS IAM User Group, User and assign policies to both, then create access keys for that user and use those access keys to launch an ec2 instance with ssh access via key-pair, follow these steps.
+
+    a. Install AWS CLI on your local machine. See https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html 
+
+    b. Create an IAM user with the policies `AdministratorAccess` and `IAMUserChangePassword` and create an access key-pair for the CLI under Security Credentials and securely store the key pair. Login once with the provided default credentials, change the password and then run `aws configure` in your local console to setup aws cli access with the key-pair, region of your choosing and json as output format.
+
+    c. Simply navigate to `scripts/` folder and execute the shell scripts.
+    ```
+    # ensure to have jq installed locally so the script can parse json
+    ./aws-create-user-group-and-policies.sh
+    ./aws-create-and-setup-ec2-instance.sh
+    sudo chmod 400 ../config/aws-ec2-ssh-key.pem
+    # the ip address is logged at the end of the ec2 shell script
+    ssh -i ../config/aws-ec2-ssh-key.pem ec2-user@3.70.253.69
+    
+    ```
 ## Usage (Exercises)
 

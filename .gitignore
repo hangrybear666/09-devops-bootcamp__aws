@@ -1,1 +1,3 @@
 .env
+config/aws.secrets
+config/aws-ec2-ssh-key.pem
