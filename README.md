@@ -128,7 +128,19 @@ The main projects are:
     sudo chmod 400 ../config/aws-ec2-ssh-key.pem
     # the ip address is logged at the end of the ec2 shell script
     ssh -i ../config/aws-ec2-ssh-key.pem ec2-user@3.70.253.69
-    
+    ```
+
+    Note: To change EC2 setup parameters you can change any of the key-value pairs in `config/aws.properties` 
+    ```
+    AWS_USER_NAME=MyDemoUser
+    AWS_DEMO_GROUP=MyDemoGroup
+    AWS_REGION=eu-central-1
+    AWS_SUBNET=eu-central-1a
+    AWS_IMAGE_ID=ami-007c3072df8eb6584
+    AWS_EC2_INSTANCE_TYPE=t2.micro
+    AWS_EC2_INSTANCE_NAME=MyDemoEc2Instance
+    AWS_OUTPUT_FORMAT=json
+    AWS_TEMP_PSWD=changeIt_1
     ```
 ## Usage (Exercises)
 
