@@ -3,7 +3,11 @@
 Collection of config files and shell scripts interacting with the AWS CLI, launching EC2 instances in AWS and automatically deploying images hosted on AWS ECR via declarative Jenkins pipelines. 
 
 The main projects are:
-- 
+- Docker installation script for ec2 instances
+- Docker Image deployment script for ec2 instances
+- A multibranch jenkins pipeline with versioning, git webhooks and scripted deployment on EC2 instances via docker run or docker compose based on user choice
+- AWS shell script to create user, user group and assign policies to both allowing aws cli and aws console login via credentials
+- AWS shell script to use the newly created user to launch an ec2 instance and ssh into it via private key created by the script
 
 ## Setup
 
