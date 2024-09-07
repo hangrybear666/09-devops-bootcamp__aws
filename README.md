@@ -1,6 +1,6 @@
-# Launching AWS EC2 instances, pushing images to AWS ECR and subsequently deploying them as containers via shell scripts in jenkins pipelines.
+# Launching AWS EC2 instances, pushing images to AWS ECR, creating IAM access and deploying containers via shell scripts in jenkins pipelines.
 
-Collection of config files and shell scripts interacting with the AWS CLI, launching EC2 instances in AWS and automatically deploying images hosted on AWS ECR via declarative Jenkins pipelines. 
+Collection of Config files and shell scripts interacting with the AWS CLI, creating IAM users and policies, launching EC2 instances and deploying ECR images via declarative Jenkins pipeline. 
 
 The main projects are:
 - Docker installation script for ec2 instances
