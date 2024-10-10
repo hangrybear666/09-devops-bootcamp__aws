@@ -39,6 +39,10 @@ Collection of Config files and shell scripts interacting with the AWS CLI, creat
 
     Make sure to install docker and docker-compose (typically built-in) for local development. See https://docs.docker.com/engine/install/
 
+### 6. Install AWS CLI on your development machine
+
+Follow the steps described in https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html
+
 ## Usage (Demo Projects)
 
 <details closed>
